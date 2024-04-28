@@ -3,9 +3,10 @@ use {
         header::{ControlMessageType, DataMessageType, Header, MessageType},
         pdo::{
             AugmentedPowerDataObject, AugmentedPowerDataObjectRaw, Battery,
-            EPRAdjustableVoltageSupply, FixedSupply, PowerDataObject, PowerDataObjectRaw,
-            SPRProgrammablePowerSupply, VDMHeader, VDMHeaderRaw, VDMHeaderStructured,
-            VDMHeaderUnstructured, VDMType, VariableSupply,
+            EPRAdjustableVoltageSupply, FixedSupply, FixedVariableRequestDataObject,
+            PowerDataObject, PowerDataObjectRaw, RequestDataObject, SPRProgrammablePowerSupply,
+            VDMHeader, VDMHeaderRaw, VDMHeaderStructured, VDMHeaderUnstructured, VDMType,
+            VariableSupply,
         },
     },
     byteorder::{ByteOrder, LittleEndian},
@@ -19,6 +20,7 @@ pub enum Message {
     Reject,
     Ready,
     SourceCapabilities(Vec<PowerDataObject, 8>),
+    Request(RequestDataObject),
     VendorDefined(VDMHeader), // TODO: Incomplete
     SoftReset,
     Unknown,
@@ -55,6 +57,11 @@ impl Message {
                     })
                     .collect(),
             ),
+            MessageType::Data(DataMessageType::Request) => {
+                Message::Request(RequestDataObject::FixedSupply(
+                    FixedVariableRequestDataObject(LittleEndian::read_u32(payload)),
+                ))
+            }
             MessageType::Data(DataMessageType::VendorDefined) => {
                 // Keep for now...
                 // let len = payload.len();

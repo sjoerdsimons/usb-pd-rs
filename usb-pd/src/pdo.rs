@@ -125,6 +125,11 @@ bitfield! {
     }
 }
 
+#[derive(Clone, Copy, Debug, Format)]
+pub enum RequestDataObject {
+    FixedSupply(FixedVariableRequestDataObject),
+}
+
 bitfield! {
     #[derive(Clone, Copy, PartialEq, Eq, Format)]
     pub struct FixedVariableRequestDataObject(pub u32): Debug, FromRaw, IntoRaw {
